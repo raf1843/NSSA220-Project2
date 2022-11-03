@@ -21,10 +21,10 @@ Capture files contain anywhere from 1300-1800 packets
 Metrics:
 
 Data size (8):
-  1. # echo requests sent
-  2. # echo requests recv
-  3. # echo replies sent
-  4. # echo replies recv
+  1. number of echo requests sent
+  2. number of echo requests recv
+  3. number of echo replies sent
+  4. number of echo replies recv
   5. total echo request bytes sent
   6. total echo request bytes recv
   7. total echo request data sent in bytes (based on amount of data in ICMP payload)
@@ -42,4 +42,4 @@ Time based (4):
      (time btwn node receiving echo req and sending echo reply)
      
  Distance (1):
-  1. # hops per echo req
+  1. number of hops per echo req
