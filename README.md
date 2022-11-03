@@ -18,9 +18,9 @@ compute 13 metrics from them
 Given one .pcap and one raw .txt file derived from pcap per node
 Capture files contain anywhere from 1300-1800 packets
 
-1. Filter packets to only echo requests and replies
-2. Parse relevant fields out of filtered packets
-3. Calculate metrics from relevant fields
+1. Filter packets to only echo requests and replies - Gavin
+2. Parse relevant fields out of filtered packets - Ivan
+3. Calculate metrics from relevant fields - Raina
 
 Metrics:
 
