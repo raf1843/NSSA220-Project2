@@ -1,3 +1,5 @@
+import re
+
 def parse(filename, L, ip):
 	pingData=[]
 	eReqSent=0
@@ -26,11 +28,20 @@ def parse(filename, L, ip):
 		 
 	print(eReqSent, eReqRec, eRepSent, eRepRec)
 
+def hex_parser(filename, L, ip):
+	pData=[]	
+
+	with open(filename, 'r') as f:
+		for line in f:
+			if (line.isspace() == False):
+				pline=re.sub(' +', ' ', line.strip())
+				pData.append(pline)
+		print(pData)
 #main
-filename="example.txt"
+filename="example2.txt"
 L=[]
 ip="192.168.100.1"
 
-parse(filename, L, ip)
-
+#parse(filename, L, ip)
+hex_parser(filename, L, ip)
 	
