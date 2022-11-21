@@ -14,21 +14,20 @@ def filter(filename, data):
 	#used to group the full packet together in order to put it into the data list
 	while line:
 		if("No." in line):
-			outfile.write(line)
 			line = infile.readline()
 			if("ICMP" and "Echo" in line):
 				outfile.write(line)
 				for i in range(6):
 					line = infile.readline()
 					outfile.write(line)
-			else:
-				line = infile.readline()	
+		else:
+			line = infile.readline()	
 
 	infile.close()
 	outfile.close()
 
 
 #main
-filename = "example.txt"
+filename = "Node1.txt"
 data = []
 filter(filename, data)
