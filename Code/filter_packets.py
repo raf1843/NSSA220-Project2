@@ -3,41 +3,32 @@
 
 #look "in" on line and do not split
 #skip blank lines and know that file will end with blank line
+#take the name of the file to make the name of the outfile
 import re
-#just splitting and .join
-def filter(filename, data) :
-	#print('called filter function in filter_packets.py')
+
+def filter(filename, data):
 	infile = open(filename, 'r')
-	line = re.sub(' +', ' ', infile.readline())
-	line = line.split(" ")
+	line = infile.readline()
+
+	outfile = open(filename.split(".")[0] + '_filtered.txt', 'w')
 	#used to group the full packet together in order to put it into the data list
-	temp_storage = []
 	while line:
-		if(line[0] == "No."):
-			line = line = re.sub(' +', ' ', infile.readline())
-			line = line.split(" ")
-			if(line[5] == "ICMP" and line[7] == "Echo"):
-				#start adding to temp_storage
-				temp_storage.append(line)
+		if("No." in line):
+			outfile.write(line)
+			line = infile.readline()
+			if("ICMP" and "Echo" in line):
+				outfile.write(line)
 				for i in range(6):
-					line = re.sub(' +', ' ', infile.readline())
-					line = line.split(" ")
-					temp_storage.append(line)
-				data.append(temp_storage)
-				line = re.sub(' +', ' ', infile.readline())
-				line = line.split(" ")	
-		#WILL NOT GO TO THE NEXT PACKET
-			elif not(line[5] == "ICMP") and not (line[7] == "Echo"):
-				line = re.sub(' +', ' ', infile.readline())
-				print(line)
+					line = infile.readline()
+					outfile.write(line)
+			else:
+				line = infile.readline()	
+
 	infile.close()
+	outfile.close()
 
 
 #main
 filename = "example.txt"
 data = []
 filter(filename, data)
-
-#print(data)
-#debugging purposes
-print(data)
