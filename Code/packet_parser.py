@@ -15,7 +15,7 @@ Dictionary Format:
 Packet Tuple : Response Packet Tuple
 
 Packet Format (Same for both Packet and Response Packet):
-[(Packet No.), (Time), (Source IP), (Dest. IP), (Msg Type), (Payload Size), (Seq No.), (Associated Packet No.)]
+[(Packet No.), (Time), (Source IP), (Dest. IP), (Msg Type), (Payload Size), (Seq No.), (TTL), (Associated Packet No.)]
 -------------------------------------------------------------------------------------------------------------------------
 Some Notes!
 1) There is no need for any cutting of header lengths from the Payload Size, the math is already done! Payload Size
@@ -115,11 +115,11 @@ def hex_parse(L, ip, D):
 			eString="Echo Reply Received"	
 		
 		temp=packet[0].split(" ")
-		tlist.append((temp[0], temp[1], sip, dip, eString, (int(packet[1][16], 16) + int(packet[1][17], 16)-28), temp[10], int(re.search(r'(\d+)', temp[14]).group())))
+		tlist.append((temp[0], temp[1], sip, dip, eString, (int(packet[1][16], 16) + int(packet[1][17], 16)-28), temp[10], int(packet[1][22], 16), int(re.search(r'(\d+)', temp[14]).group())))
 
 	for item in tlist:
 		for item2 in tlist:
-			if(item2[7]==int(item[0])) and item not in D.values():
+			if(item2[8]==int(item[0])) and item not in D.values():
 				D[item]=item2
 
 	return (eReqSent, eReqRec, eRepSent,eRepRec)
