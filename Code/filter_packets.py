@@ -6,7 +6,7 @@
 #take the name of the file to make the name of the outfile
 import re
 
-def filter(filename, data):
+def filter(filename):
 	infile = open(filename, 'r')
 	line = infile.readline()
 
