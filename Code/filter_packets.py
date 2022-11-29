@@ -28,6 +28,6 @@ def filter(filename, data):
 
 
 #main
-filename = "Node1.txt"
-data = []
-filter(filename, data)
+#filename = "Node1.txt"
+#data = []
+#filter(filename, data)
