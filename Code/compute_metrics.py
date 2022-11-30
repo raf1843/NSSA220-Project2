@@ -42,49 +42,51 @@ def size_metrics(packets):
 		req_bytes_sent, req_bytes_recv, req_data_sent, req_data_recv]
 			
 
-def time_metrics(packets, req_bytes_sent, req_data_sent, num_req_sent, num_rep_sent): 
+def time_metrics(packet_dict, req_bytes_sent, req_data_sent, num_req_sent, num_rep_sent): 
 	# ping round trip time
 	# time btwn send req and recv rep in ms
 	avg_rtt = 0
 	sum_rtt = 0
-	for i in range(0, len(packets)): 
-		if packets[i][1] == 0 and packets[i][2] == 's':
-			for j in range (i, len(packets)):
-				if packets[i][0] == packets[j][0] and packets[j][1] == 8:
-					sum_rtt += (packets[j][4] - packets[i][4])
-	avg_rtt = sum_rtt / num_req_sent		
+	for p in packet_dict.keys():
+		if "Request Sent" in p[4]:
+			sum_rtt += (float(packet_dict[p][1]) - float(p[1]))
+	avg_rtt = sum_rtt / num_req_sent	
+	# convert to ms
+	avg_rtt *= 1000	
 
 	# throughput in kB/s - frames
 	req_tput = req_bytes_sent / sum_rtt
+	# convert to kB
+	req_tput /= 1000
 	# goodput in kB/s - data
 	req_gput = req_data_sent / sum_rtt
+	# convert to kB
+	req_gput /= 1000
 	# avg reply delay in microseconds
 	# time between node receiving req and sending rep
 	avg_rep_delay = 0
 	sum_rep_delay = 0
-	for i in range(0, len(packets)): 
-		if packets[i][1] == 0 and packets[i][2] == 'r':
-			for j in range (i, len(packets)):
-				if packets[i][0] == packets[j][0] and packets[j][1] == 8:
-					sum_rep_delay += (packets[j][4] - packets[i][4])
+	for p in packet_dict.keys(): 
+		if "Request Received" in p[4]:
+			sum_rep_delay += (float(packet_dict[p][1]) - float(p[1]))
 	avg_rep_delay = sum_rep_delay / num_rep_sent
+	# convert to microseconds
+	avg_rep_delay *= 1000000
 	return [avg_rtt, req_tput, req_gput, avg_rep_delay]
 
 
-def distance_metrics(packets, num_req_sent):
+def distance_metrics(packet_dict, num_req_sent):
 	# avg num hops per request
 	avg_hops_req = 0
 	sum_hops_req = 0
-	for i in range(0, len(packets)): 
-		if packets[i][1] == 0 and packets[i][2] == 's':
-			for j in range (i, len(packets)):
-				if packets[i][0] == packets[j][0] and packets[j][1] == 8:
-					ttl_req = packets[i][5]
-					ttl_rep = packets[j][5]
-					hops = ttl_req - ttl_rep + 1 # need to figure out how this will actually work
-					sum_hops_req += hops
+	for p in packet_dict.keys(): 
+		if "Request Sent" in p[4]:
+			ttl_req = p[8]
+			ttl_rep = packet_dict[p][8]
+			hops = ttl_req - ttl_rep + 1 
+			sum_hops_req += hops
 	avg_hops_req = sum_hops_req / num_req_sent
-	return int(avg_hops_req)
+	return avg_hops_req
 
 
 def compute(packet_dict):
@@ -93,13 +95,26 @@ def compute(packet_dict):
 		packets.append(k)
 		packets.append(packet_dict[k])
 	size_mets = size_metrics(packets)
-	print("Size: ", size_mets)
-	# pass through request bytes sent, request data sent, number of requests sent, and number of 	replies sent
-	#time_mets = time_metrics(packets, size_mets[4], size_mets[6], size_mets[3], size_mets[4])
-	#print("Time: ", time_mets)
+	# pass through request bytes sent, request data sent, number of requests sent, and number of replies sent
+	time_mets = time_metrics(packet_dict, size_mets[4], size_mets[6], size_mets[0], size_mets[2])
 	# pass through number of requests sent
-	#dist_mets = distance_metrics(packets, size_mets[0])
-	#print("Distance: ", dist_mets)
+	dist_mets = distance_metrics(packet_dict, size_mets[0])
+	
+	# OUTPUT
+	print("---------------SIZE METRICS---------------")
+	size_strs = ["Echo Requests Sent", "Echo Requests Received", "Echo Replies Sent",\
+	"Echo Replies Received", "Echo Request Bytes Sent", "Echo Request Bytes Received", \
+	"Echo Request Data Sent", "Echo Request Data Received"]
+	for i in range(0, len(size_mets)):
+		print(f"{size_strs[i] : <35} {size_mets[i] : >6}")
+	print("---------------TIME METRICS---------------")
+	time_strs = ["Average RTT (ms)", "Echo Request Throughput (kB/sec)", \
+	"Echo Request Goodput (kB/sec)", "Average Reply Delay (μs)"]
+	for i in range(0, len(time_mets)):
+		print(f"{time_strs[i] : <35} {time_mets[i] : >6.2f}")
+	print("-------------DISTANCE METRICS-------------")
+	print(f"{'Average Echo Request Hop Count' : <35} {dist_mets : >6.2f}")
+
 
 
 # Dictionary Format:

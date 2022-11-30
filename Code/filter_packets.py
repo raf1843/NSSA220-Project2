@@ -10,7 +10,10 @@ def filter(filename):
 	infile = open(filename, 'r')
 	line = infile.readline()
 
-	outfile = open(filename.split(".")[0] + '_filtered.txt', 'w')
+	# fixing ../ problem
+	i = filename.rindex('.')
+	outfile = open(filename[:i] + '_filtered.txt', 'w')
+	#outfile = open(filename.split(".")[0] + '_filtered.txt', 'w')
 	#used to group the full packet together in order to put it into the data list
 	while line:
 		if("No." in line):
