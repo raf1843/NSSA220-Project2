@@ -1,11 +1,10 @@
+
 """
 AHHHHHHHH Packet Parsing!!
 -------------------------------------------------------------------------------------------------------------------------
 3 Functions
 1) parse = NOT COMPLETE and will most likely be deleted
-
 2) hex_formatting = Reads Filtered Files and formats the data into data lists that can be more easily parsed
-
 3) hex_parse = Takes the data list from (2)hex_formatting and through a bunch of magic generates a dictionary
    of which pairs Packet to the Response Packet as seen from the Host PC. hex_parse will generate the dictionary 
    via pass through and then it will return the 4 initial metrics we need.
@@ -13,14 +12,12 @@ AHHHHHHHH Packet Parsing!!
 D is our output Dictionary
 Dictionary Format:
 Packet Tuple : Response Packet Tuple
-
 Packet Format (Same for both Packet and Response Packet):
 [(Packet No.), (Time), (Source IP), (Dest. IP), (Msg Type), (Total Packet Size), (Payload Size), (Seq No.), (TTL), (Associated Packet No.)]
 -------------------------------------------------------------------------------------------------------------------------
 Some Notes!
 1) There is no need for any cutting of header lengths from the Payload Size, the math is already done! Payload Size
    is strictly the ICMP Payload Size!
-
 2) Associated Packet No. This is the packet that is either the response packet or the packet that this current 
    packet is responding to!
 -------------------------------------------------------------------------------------------------------------------------
@@ -28,6 +25,7 @@ Some Notes!
 
 import re
 
+'''
 def parse(filename, L, ip):
 	pingData=[]
 	eReqSent=0
@@ -55,6 +53,7 @@ def parse(filename, L, ip):
 			eRepRec+=1
 		 
 	print(eReqSent, eReqRec, eRepSent, eRepRec)
+'''
 
 def hex_formatting(filename, dataList):
 	pingData=[]
@@ -89,7 +88,9 @@ def hex_formatting(filename, dataList):
 		del pack[1:len(pack)]
 		pack.append(hexp)
 
+
 def hex_parse(L, ip, D):
+	eString=""
 	eReqSent=0
 	eReqRec=0
 	eRepSent=0
@@ -114,10 +115,13 @@ def hex_parse(L, ip, D):
 			eRepRec+=1
 			eString="Echo Reply Received"	
 
-		ipSize=int(packet[1][16], 16) + int(packet[1][17], 16)		
+		# Testing concatenation fix here
+		#ipSize=int(packet[1][16], 16) + int(packet[1][17], 16)	
+		ipSize=int(packet[1][16] + packet[1][17], 16)	
 	
 		temp=packet[0].split(" ")
-		tlist.append((temp[0], temp[1], sip, dip, eString, (ipSize-28), temp[10], (ipSize+14), int(packet[1][22], 16), int(re.search(r'(\d+)', temp[14]).group())))
+		# rearranged this to match documentation - R
+		tlist.append((temp[0], temp[1], sip, dip, eString, (ipSize+14), (ipSize-28), temp[10], int(packet[1][22], 16), int(re.search(r'(\d+)', temp[14]).group())))
 
 	for item in tlist:
 		for item2 in tlist:
@@ -125,16 +129,18 @@ def hex_parse(L, ip, D):
 				D[item]=item2
 
 	return (eReqSent, eReqRec, eRepSent,eRepRec)
+
 #main
-filename="Node1_filtered.txt"
-L=[]
-D={}
-ip="192.168.100.1"
+#filename="example_filtered.txt"
+#L=[]
+#D={}
+#ip="192.168.100.1"
 
 #parse(filename, L, ip)
-hex_formatting(filename, L)
-iMet=hex_parse(L, ip, D)
+#hex_formatting(filename, L)
+#iMet=hex_parse(L, ip, D)
 
 #Test Prints (This is also your warning to not uncomment and print the dictionary!!!)
-print(iMet)
-print(iMet, "\n", D)
+#print(iMet)
+#print(iMet, "\n", D)
+
