@@ -89,33 +89,56 @@ def distance_metrics(packet_dict, num_req_sent):
 	return avg_hops_req
 
 
-def compute(packet_dict):
+def compute(packet_dict, out_fn):
 	packets = []
 	for k in packet_dict.keys():
 		packets.append(k)
 		packets.append(packet_dict[k])
 	size_mets = size_metrics(packets)
+	'''
+	returns [num_req_sent, num_req_recv, num_rep_sent, num_rep_recv, 
+			req_bytes_sent, req_bytes_recv, req_data_sent, req_data_recv]
+'	'''
+
 	# pass through request bytes sent, request data sent, number of requests sent, and number of replies sent
 	time_mets = time_metrics(packet_dict, size_mets[4], size_mets[6], size_mets[0], size_mets[2])
+	'''
+	returns [avg_rtt, req_tput, req_gput, avg_rep_delay]
+'	'''
+
 	# pass through number of requests sent
 	dist_mets = distance_metrics(packet_dict, size_mets[0])
+	'''
+	returns avg_hops_req
+	'''
 	
 	# OUTPUT
-	print("---------------SIZE METRICS---------------")
-	size_strs = ["Echo Requests Sent", "Echo Requests Received", "Echo Replies Sent",\
-	"Echo Replies Received", "Echo Request Bytes Sent", "Echo Request Bytes Received", \
-	"Echo Request Data Sent", "Echo Request Data Received"]
-	for i in range(0, len(size_mets)):
-		print(f"{size_strs[i] : <35} {size_mets[i] : >6}")
-	print("---------------TIME METRICS---------------")
-	time_strs = ["Average RTT (ms)", "Echo Request Throughput (kB/sec)", \
-	"Echo Request Goodput (kB/sec)", "Average Reply Delay (μs)"]
-	for i in range(0, len(time_mets)):
-		print(f"{time_strs[i] : <35} {time_mets[i] : >6.2f}")
-	print("-------------DISTANCE METRICS-------------")
-	print(f"{'Average Echo Request Hop Count' : <35} {dist_mets : >6.2f}")
-
-
+	temp = ""
+	with open (out_fn, 'a') as f:
+		# size
+		f.write("Echo Requests Sent,Echo Requests Received,Echo Replies Sent,Echo Replies Received\n")
+		for i in range(0,4):
+			temp += str(size_mets[i])
+			if i < 3:
+				temp += ','
+			else:
+				temp += '\n'
+		f.write(temp)
+		f.write("Echo Request Bytes Sent (bytes),Echo Request Data Sent (bytes)\n")
+		temp = str(size_mets[4]) + ',' + str(size_mets[5]) + '\n'
+		f.write(temp)
+		f.write("Echo Request Bytes Received (bytes),Echo Request Data Received (bytes)\n")
+		temp = str(size_mets[6]) + ',' + str(size_mets[7]) + '\n\n'
+		f.write(temp)
+		
+		# time + distance
+		timestrs = ["Average RTT (milliseconds)", "Echo Request Throughput (kB/sec)", \
+		"Echo Request Goodput (kB/sec)", "Average Reply Delay (microseconds)"]
+		for i in range(0,len(timestrs)):
+			temp = timestrs[i] + ',' + str(round(time_mets[i], 2)) + '\n'
+			f.write(temp)
+		f.write('Average Echo Request Hop Count' + ',' + str(round(dist_mets, 2)) + '\n\n')
+		
 
 # Dictionary Format:
 # Packet Tuple : Response Packet Tuple
