@@ -22,13 +22,13 @@ L1, L2, L3, L4 = [], [], [], []
 D1, D2, D3, D4 = {}, {}, {}, {}
 # for each node, format then parse
 hex_formatting('../Captures/Node1_filtered.txt', L1) 
-iMet = hex_parse(L1, ip1, D1)
+hex_parse(L1, ip1, D1)
 hex_formatting('../Captures/Node2_filtered.txt', L2) 
-iMet = hex_parse(L2, ip2, D2)
+hex_parse(L2, ip2, D2)
 hex_formatting('../Captures/Node3_filtered.txt', L3) 
-iMet = hex_parse(L3, ip3, D3)
+hex_parse(L3, ip3, D3)
 hex_formatting('../Captures/Node4_filtered.txt', L4) 
-iMet = hex_parse(L4, ip4, D4)
+hex_parse(L4, ip4, D4)
 
 print("\nComputing for Node 1...")
 compute(D1)
